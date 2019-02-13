@@ -1,0 +1,300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>居民个人综合所得预扣预缴税款计算器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="http://code.jquery.com/jquery-3.3.1.min.js"></script>
+    <!-- 最新版本的 Bootstrap 核心 CSS 文件 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap.min.css"
+          integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <!-- 可选的 Bootstrap 主题文件（一般不用引入） -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/css/bootstrap-theme.min.css"
+          integrity="sha384-rHyoN1iRsVXV4nD0JutlnGaslCJuC7uwjduW9SVrLvRYooPp2bWYgmgJQIXwl/Sp" crossorigin="anonymous">
+    <!-- 最新的 Bootstrap 核心 JavaScript 文件 -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@3.3.7/dist/js/bootstrap.min.js"
+            integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa"
+            crossorigin="anonymous"></script>
+</head>
+<body style="padding: 10px;">
+<h4>居民个人综合所得预扣预缴税款计算器</h4>
+<form class="form-horizontal" style="width: 100%;margin-top: 20px;">
+    <div class="form-group">
+        <label for="sallery-input" class="col-sm-2 control-label">月工资:</label>
+        <div class="col-sm-5">
+            <input class="form-control" type="number" id="sallery-input" onchange="change_sd_gjj()" value="0"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="diff-input" class=  "col-sm-2 control-label">专项扣除:</label>
+		
+        <div class="col-sm-5">
+            <input  class="form-control"  type="number" id="diff-input" value="0"/>
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="diff-input" class=  "col-sm-2 control-label">社保汇缴基数:</label>
+        <div class="col-sm-5">
+            <input  class="form-control"  type="number" id="socialSecurity-input" disabled="disabled" value="5080"/>
+        </div>
+		 自定义
+        <input type="checkbox" onchange="socialSecurity()" id="socialSecurity-checkbox">
+    </div>
+	<div class="form-group">
+        <label for="diff-input" class=  "col-sm-2 control-label">公积金汇缴基数:</label>
+        <div class="col-sm-5">
+            <input  class="form-control"  type="number" id="accumulationFund-input" disabled="disabled" value="2273"/>
+        </div>
+		 自定义
+        <input type="checkbox" onchange="accumulationFund()" id="accumulationFund-checkbox">
+    </div>
+    <div class="form-group">
+        <div class="col-sm-offset-1 col-sm-10">
+            <input type="button" class="btn btn-primary" value="计算" onclick="taxCount()">
+        </div>
+    </div>
+</form>
+
+<div>
+    <div>
+        <span class="label label-primary">五险一金:</span>
+        <div id="five-risk-one-gold" style="margin-top: 10px;padding-left: 20px;"></div>
+    </div>
+
+    <div style="margin-top: 10px;">
+        <div>
+        <span class="label label-primary">每月缴税</span>
+        </div>
+		<table class="table">
+			<thead>
+				<tr>
+					<th>月份</th>
+					<th>个税(旧)</th>
+					<th>个税(新)</th>
+					<th>税后</th>
+					<th>到手(+公积金)</th>
+					<th>(*^__^*)省</th>
+				</tr>
+			</thead>
+			<tbody  id="tax-list">
+				
+			</tbody>
+		</table>
+    </div>
+</div>
+
+<div style="height: 50px;"></div>
+
+<script>
+	//社保自定义
+	function socialSecurity(){
+		if($("#socialSecurity-checkbox").prop("checked") == true){
+			// 社保可编写状态
+			$('#socialSecurity-input').removeAttr("disabled")
+		}else{		
+			// 社保只读状态
+			$('#socialSecurity-input').attr("disabled","disabled")
+		}
+	}
+	//公积金自定义
+	function accumulationFund(){
+		if($("#accumulationFund-checkbox").prop("checked") == true){
+			// 公积金可编写状态
+			$('#accumulationFund-input').removeAttr("disabled")
+		}else{		
+			// 公积金只读状态
+			$('#accumulationFund-input').attr("disabled","disabled")
+		}
+	}
+	function change_sd_gjj(){
+		//工资
+        var sallery = parseInt($("#sallery-input").val());
+	
+		//******修改根据上限修改  北京社保汇缴基数上限为25401 下限5080 公积金上限25401 下限2273****
+		
+		if(sallery<5080){
+			$("#socialSecurity-input").val(5080);
+		}else if(sallery>25401){
+			$("#socialSecurity-input").val(25401);
+		}else {			
+			//如果选择自定义则社保不改变
+			if(!$("#socialSecurity-checkbox").prop("checked")){
+				$("#socialSecurity-input").val(sallery);
+			}
+		}
+		if(sallery<2273){
+			$("#accumulationFund-input").val(2273);
+		}else if(sallery>25401){
+			$("#accumulationFund-input").val(25401);
+		}else {
+			//如果选择自定义则公积金不改变
+			if(!$("#accumulationFund-checkbox").prop("checked")){
+				$("#accumulationFund-input").val(sallery);
+			}
+		}
+	}
+
+    function getPercent(remain) {
+        if (remain <= 36000) {
+            return [0, 0.03];
+        } else if (remain > 36000 && remain <= 144000) {
+            return [2520, 0.1];
+        } else if (remain > 144000 && remain <= 300000) {
+            return [16920, 0.2];
+        } else if (remain > 300000 && remain <= 420000) {
+            return [31920, 0.25];
+        } else if (remain > 420000 && remain <= 660000) {
+            return [52920, 0.3];
+        } else if (remain > 660000 && remain <= 960000) {
+            return [85920, 0.35];
+        } else if (remain > 960000) {
+            return [181920, 0.45];
+        }
+    }
+	
+	function getPercentOld(remain) {
+        if (remain <= 1500) {
+            return [0, 0.03];
+        } else if (remain > 1500 && remain <= 4500) {
+            return [105, 0.1];
+        } else if (remain > 4500 && remain <= 9000) {
+            return [555, 0.2];
+        } else if (remain > 9000 && remain <= 35000) {
+            return [1005, 0.25];
+        } else if (remain > 35000 && remain <= 55000) {
+            return [2755, 0.3];
+        } else if (remain > 55000 && remain <= 80000) {
+            return [5505, 0.35];
+        } else if (remain > 80000) {
+            return [13505, 0.45];
+        }
+    }
+
+    function sumArray(array) {
+        var total = 0;
+        array.forEach(function (tax) {
+            total += tax;
+        });
+        return total;
+    }
+
+
+    function taxCount() {
+
+		//基本扣除
+        var base = 5000;
+		var baseOld =3500;
+		//工资
+        var sallery = parseInt($("#sallery-input").val());
+		//专项扣除
+        var diff = parseInt($("#diff-input").val());
+		//社保
+		var socialSecurity = $("#socialSecurity-input").val();
+		//公积金
+		var accumulationFund = $("#accumulationFund-input").val();
+		
+		//校验
+		//!$("#socialSecurity-checkbox").prop("checked")
+		if(sallery>5080 && socialSecurity<5080 ){
+			$("#socialSecurity-input").val(5080);
+			socialSecurity=5080;
+		}
+		if(sallery>2273 && accumulationFund<2273 ){
+			$("#accumulationFund-input").val(2273);
+			accumulationFund=2273;
+		}
+		if(sallery>5000){
+			//******修改根据上限修改  北京社保汇缴基数上限为25401 下限5080 公积金上限25401 下限2273****
+			var fiveRiskBase = [5080, 25401];
+			var oneGold = [2273, 25401];
+
+			var fiverRiskForTax = socialSecurity;
+			
+			if (socialSecurity < fiveRiskBase[0]) {
+				fiverRiskForTax = fiveRiskBase[0];
+			} else if (socialSecurity > fiveRiskBase[1]) {
+				fiverRiskForTax = fiveRiskBase[1]
+			}
+
+			// 个人养老保险8% 医疗保险2% 失业保险0.2%
+			var fiveRiskTaxList = [fiverRiskForTax * 0.08, fiverRiskForTax * 0.02, fiverRiskForTax * 0.002];
+			var fiveRiskTax = sumArray(fiveRiskTaxList);
+
+
+			var oneGoldForTax = accumulationFund;
+
+			if (accumulationFund < oneGold[0]) {
+				oneGoldForTax = oneGold[0];
+			} else if (accumulationFund > oneGold[1]) {
+				oneGoldForTax = oneGold[1]
+			}
+			//公积金 12%
+			var oneGoldTax = oneGoldForTax * 0.12;
+
+
+			var fiveRiskOneGold = fiveRiskTax + oneGoldTax;
+
+			console.log('五险:', fiveRiskTaxList);
+			console.log('一金:', oneGoldTax);
+
+			var fivOneString = '<span class="label label-warning">三险(养老、医疗、失业):</span>&nbsp;&nbsp;<span class="label label-success">' + fiveRiskTaxList.join('</span>&nbsp;&nbsp;<span class="label label-success">')
+					+ '</span>&nbsp;&nbsp;&nbsp;<span class="label label-warning">公积金:</span>&nbsp;&nbsp;<span class="label label-success">' + oneGoldTax.toFixed(2)+'</span>';
+
+			document.getElementById("five-risk-one-gold").innerHTML = fivOneString;
+			///////////////////////////////////////////老税//////////////////////////////////
+			
+			var taxOld_pre = sallery - fiveRiskOneGold - baseOld;
+			var taxInfo = getPercentOld(taxOld_pre);
+			var taxOld = taxOld_pre * taxInfo[1] - taxInfo[0] ;
+			//////////////////////////////////////////新税//////////////////////////////////
+			var tax = [];
+			var taxListString = '';
+			//税合计
+			var taxCounts = 0;
+			//工资合计
+			var counts = 0;
+			//税前减去各项基数
+			var pre_tax = (sallery - (fiveRiskOneGold + diff + base)); 
+			for (var i = 1; i <= 12; i++) {
+				var currentMonthRemain = pre_tax * i;
+				console.log(i, currentMonthRemain);
+				var taxPercentInfo = getPercent(currentMonthRemain);
+				tax[i] = currentMonthRemain * taxPercentInfo[1] - taxPercentInfo[0] - sumArray(tax);
+				taxCounts += Math.max(tax[i],0);
+				counts += (sallery - fiveRiskOneGold - Math.max(tax[i],0));
+				taxListString += '<tr>';
+				taxListString += '<th>' + i + '月</th>';
+				taxListString += '<th>' + (taxOld).toFixed(2) + '</th>';
+				taxListString += '<th>' + Math.max(tax[i],0).toFixed(2) + '</th>';
+				taxListString += '<th>' + (sallery - fiveRiskOneGold - Math.max(tax[i],0)).toFixed(2) + '</th>';
+				taxListString += '<th>' + (sallery - fiveRiskOneGold).toFixed(2) +'&nbsp;&nbsp;('+ (sallery - fiveRiskOneGold + oneGoldTax ).toFixed(2)+ ')</th>';
+				taxListString += '<th>' + (taxOld - Math.max(tax[i],0)).toFixed(2) + '</th>';
+				taxListString += '</tr>';
+				 
+			}
+			taxListString += '<tr>';
+			taxListString += '<th>合计</th>';
+			taxListString += '<th>' + (taxOld*12).toFixed(2) + '</th>';
+			taxListString += '<th>' + Math.max(taxCounts,0).toFixed(2) + '</th>';
+			taxListString += '<th>' + Math.max(counts,0).toFixed(2) + '</th>';
+			taxListString += '<th>' + (Math.max(taxCounts,0) + Math.max(counts,0)).toFixed(2) +'&nbsp;&nbsp;('+ (Math.max(taxCounts,0) + Math.max(counts,0) + oneGoldTax*12 ).toFixed(2) + ')</th>';
+			taxListString += '<th>' + (taxOld*12 - Math.max(taxCounts,0)).toFixed(2) + '</th>';
+			taxListString += '</tr>';
+			
+			console.log(tax);
+
+			document.getElementById("tax-list").innerHTML = taxListString;
+			
+		}else{
+			document.getElementById("tax-list").innerHTML = "无需缴税！！！";
+		}
+    }
+
+</script>
+
+
+
+
+</body>
+
+</html>
