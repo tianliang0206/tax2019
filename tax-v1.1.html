@@ -86,6 +86,10 @@
 <div style="height: 50px;"></div>
 
 <script>
+
+	//******修改根据上限修改  北京社保汇缴基数上限为25401 下限5080 公积金上限25401 下限2273****
+	var fiveRiskBase = [5080, 25401];
+	var oneGold = [2273, 25401];
 	//社保自定义
 	function socialSecurity(){
 		if($("#socialSecurity-checkbox").prop("checked") == true){
@@ -106,26 +110,25 @@
 			$('#accumulationFund-input').attr("disabled","disabled")
 		}
 	}
+	//根据工资改变社保公积金基数
 	function change_sd_gjj(){
 		//工资
         var sallery = parseInt($("#sallery-input").val());
-	
-		//******修改根据上限修改  北京社保汇缴基数上限为25401 下限5080 公积金上限25401 下限2273****
 		
-		if(sallery<5080){
-			$("#socialSecurity-input").val(5080);
-		}else if(sallery>25401){
-			$("#socialSecurity-input").val(25401);
+		if(sallery<fiveRiskBase[0]){
+			$("#socialSecurity-input").val(fiveRiskBase[0]);
+		}else if(sallery>fiveRiskBase[1]){
+			$("#socialSecurity-input").val(fiveRiskBase[1]);
 		}else {			
 			//如果选择自定义则社保不改变
 			if(!$("#socialSecurity-checkbox").prop("checked")){
 				$("#socialSecurity-input").val(sallery);
 			}
 		}
-		if(sallery<2273){
-			$("#accumulationFund-input").val(2273);
-		}else if(sallery>25401){
-			$("#accumulationFund-input").val(25401);
+		if(sallery<oneGold[0]){
+			$("#accumulationFund-input").val(oneGold[0]);
+		}else if(sallery>oneGold[1]){
+			$("#accumulationFund-input").val(oneGold[1]);
 		}else {
 			//如果选择自定义则公积金不改变
 			if(!$("#accumulationFund-checkbox").prop("checked")){
@@ -134,6 +137,7 @@
 		}
 	}
 
+	//获取最新税率
     function getPercent(remain) {
         if (remain <= 36000) {
             return [0, 0.03];
@@ -151,7 +155,7 @@
             return [181920, 0.45];
         }
     }
-	
+	//获取老版税率
 	function getPercentOld(remain) {
         if (remain <= 1500) {
             return [0, 0.03];
@@ -169,7 +173,7 @@
             return [13505, 0.45];
         }
     }
-
+	//算总数
     function sumArray(array) {
         var total = 0;
         array.forEach(function (tax) {
@@ -178,11 +182,12 @@
         return total;
     }
 
-
+	//计算
     function taxCount() {
 
 		//基本扣除
         var base = 5000;
+		//旧版基本扣除
 		var baseOld =3500;
 		//工资
         var sallery = parseInt($("#sallery-input").val());
@@ -195,18 +200,15 @@
 		
 		//校验
 		//!$("#socialSecurity-checkbox").prop("checked")
-		if(sallery>5080 && socialSecurity<5080 ){
-			$("#socialSecurity-input").val(5080);
-			socialSecurity=5080;
+		if(sallery>fiveRiskBase[0] && socialSecurity<fiveRiskBase[0] ){
+			$("#socialSecurity-input").val(fiveRiskBase[0]);
+			socialSecurity=fiveRiskBase[0];
 		}
-		if(sallery>2273 && accumulationFund<2273 ){
-			$("#accumulationFund-input").val(2273);
-			accumulationFund=2273;
+		if(sallery>fiveRiskBase[1] && accumulationFund<fiveRiskBase[1] ){
+			$("#accumulationFund-input").val(fiveRiskBase[1]);
+			accumulationFund=fiveRiskBase[1];
 		}
-		if(sallery>5000){
-			//******修改根据上限修改  北京社保汇缴基数上限为25401 下限5080 公积金上限25401 下限2273****
-			var fiveRiskBase = [5080, 25401];
-			var oneGold = [2273, 25401];
+		if(sallery>base){
 
 			var fiverRiskForTax = socialSecurity;
 			
