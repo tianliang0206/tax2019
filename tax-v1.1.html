@@ -65,7 +65,7 @@
         <div>
         <span class="label label-primary">每月缴税</span>
         </div>
-		<table class="table">
+		<table class="table table-hover">
 			<thead>
 				<tr>
 					<th>月份</th>
@@ -198,18 +198,24 @@
 		//公积金
 		var accumulationFund = $("#accumulationFund-input").val();
 		
-		//校验
+		//校验上下限
 		//!$("#socialSecurity-checkbox").prop("checked")
 		if(sallery>fiveRiskBase[0] && socialSecurity<fiveRiskBase[0] ){
 			$("#socialSecurity-input").val(fiveRiskBase[0]);
 			socialSecurity=fiveRiskBase[0];
+		}else if(sallery>fiveRiskBase[1] && socialSecurity>fiveRiskBase[1] ){
+			$("#socialSecurity-input").val(fiveRiskBase[1]);
+			socialSecurity=fiveRiskBase[1];
 		}
-		if(sallery>fiveRiskBase[1] && accumulationFund<fiveRiskBase[1] ){
-			$("#accumulationFund-input").val(fiveRiskBase[1]);
-			accumulationFund=fiveRiskBase[1];
+		if(sallery>oneGold[0] && accumulationFund<oneGold[0] ){
+			$("#accumulationFund-input").val(oneGold[0]);
+			accumulationFund=oneGold[0];
+		}else if(sallery>oneGold[1] && accumulationFund>oneGold[1] ){
+			$("#accumulationFund-input").val(oneGold[1]);
+			accumulationFund=oneGold[1];
 		}
+		//工资大于5000进行计算
 		if(sallery>base){
-
 			var fiverRiskForTax = socialSecurity;
 			
 			if (socialSecurity < fiveRiskBase[0]) {
@@ -269,20 +275,27 @@
 				taxListString += '<th>' + (taxOld).toFixed(2) + '</th>';
 				taxListString += '<th>' + Math.max(tax[i],0).toFixed(2) + '</th>';
 				taxListString += '<th>' + (sallery - fiveRiskOneGold - Math.max(tax[i],0)).toFixed(2) + '</th>';
-				taxListString += '<th>' + (sallery - fiveRiskOneGold).toFixed(2) +'&nbsp;&nbsp;('+ (sallery - fiveRiskOneGold + oneGoldTax ).toFixed(2)+ ')</th>';
+				taxListString += '<th>' + (sallery - fiveRiskOneGold - Math.max(tax[i],0) + oneGoldTax*2 ).toFixed(2)+ '</th>';
 				taxListString += '<th>' + (taxOld - Math.max(tax[i],0)).toFixed(2) + '</th>';
 				taxListString += '</tr>';
 				 
 			}
-			taxListString += '<tr>';
+			taxListString += '<tr  class="danger">';
 			taxListString += '<th>合计</th>';
 			taxListString += '<th>' + (taxOld*12).toFixed(2) + '</th>';
 			taxListString += '<th>' + Math.max(taxCounts,0).toFixed(2) + '</th>';
 			taxListString += '<th>' + Math.max(counts,0).toFixed(2) + '</th>';
-			taxListString += '<th>' + (Math.max(taxCounts,0) + Math.max(counts,0)).toFixed(2) +'&nbsp;&nbsp;('+ (Math.max(taxCounts,0) + Math.max(counts,0) + oneGoldTax*12 ).toFixed(2) + ')</th>';
+			taxListString += '<th>' + (Math.max(counts,0) + oneGoldTax*2*12 ).toFixed(2) + '</th>';
 			taxListString += '<th>' + (taxOld*12 - Math.max(taxCounts,0)).toFixed(2) + '</th>';
 			taxListString += '</tr>';
-			
+			taxListString += '<tr  class="success">';
+			taxListString += '<th>平均</th>';
+			taxListString += '<th>' + (taxOld).toFixed(2) + '</th>';
+			taxListString += '<th>' + (taxCounts/12).toFixed(2) + '</th>';
+			taxListString += '<th>' + Math.max(counts/12,0).toFixed(2) + '</th>';
+			taxListString += '<th>' + ((Math.max(counts,0) + oneGoldTax*2*12 )/12).toFixed(2) + '</th>';
+			taxListString += '<th>' + ((taxOld*12 - Math.max(taxCounts,0))/12).toFixed(2) + '</th>';
+			taxListString += '</tr>';
 			console.log(tax);
 
 			document.getElementById("tax-list").innerHTML = taxListString;
